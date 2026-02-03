@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using System;
 using WebAPI_2.Abstract;
@@ -13,9 +12,24 @@ namespace WebAPI_2
     {
         public static void Main(string[] args)
         {
+            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+
+            // Add CORS services
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:3000", "http://localhost:3001")
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials();
+                    });
+            });
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -53,6 +67,9 @@ namespace WebAPI_2
             }
 
             app.UseHttpsRedirection();
+
+            // IMPORTANT: Add CORS before Authorization
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseAuthorization();
 

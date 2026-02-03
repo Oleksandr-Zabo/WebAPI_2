@@ -152,10 +152,10 @@ namespace WebAPI_2.Services
                 return (false, "Birth date cannot be in the future.");
             }
 
-            var minBirthDate = today.AddYears(-150);
+            var minBirthDate = today.AddYears(-350);
             if (birthDate < minBirthDate)
             {
-                return (false, "Birth date is too far in the past (max 150 years ago).");
+                return (false, "Birth date is too far in the past (max 350 years ago).");
             }
 
             return (true, null);

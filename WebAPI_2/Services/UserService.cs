@@ -68,6 +68,13 @@ namespace WebAPI_2.Services
                 existingUser.Password = request.Password; // In production, hash the password!
             }
 
+            var result = _userRepository.UpdateUser(existingUser);
+            
+            if (!result)
+            {
+                return (false, "Failed to update user.");
+            }
+
             return (true, null);
         }
 
@@ -77,6 +84,14 @@ namespace WebAPI_2.Services
             if (user == null)
             {
                 return (false, "User not found.");
+            }
+
+            
+            var result = _userRepository.DeleteUser(id);
+            
+            if (!result)
+            {
+                return (false, "Failed to delete user.");
             }
 
             return (true, "User deleted successfully.");
