@@ -15,12 +15,12 @@ namespace WebAPI_2.Controllers
     public class AuthController: ControllerBase
     {
         private readonly UsersStore _users;
-
         private readonly JwtToken _jwt;
 
         public AuthController(UsersStore users, IConfiguration config)
         {
             _users = users;
+            _users.Create("admin", "admin", Roles.Admin);
             _jwt = new JwtToken(config);
         }
 

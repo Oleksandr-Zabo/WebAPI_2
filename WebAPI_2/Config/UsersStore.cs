@@ -56,7 +56,7 @@ namespace WebAPI_2.Core
 
         public bool CheckPassword(UserRecord user, string password)
         { 
-            return user != null && user.PasswordHash == password;
+            return user != null && user.PasswordHash == Hash(password);
         }
 
         private static string Hash(string value)
