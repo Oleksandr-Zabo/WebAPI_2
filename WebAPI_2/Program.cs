@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using System;
+using Microsoft.IdentityModel.Tokens;
 using WebAPI_2.Abstract;
+using WebAPI_2.Core;
 using WebAPI_2.DAL;
 using WebAPI_2.DAL.Abstracts;
 using WebAPI_2.DAL.Repositories;
@@ -35,9 +37,32 @@ namespace WebAPI_2
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             //builder.Services.AddOpenApi();
 
+            builder.Services.AddSingleton<UsersStore>();
+
             builder.Services.AddEndpointsApiExplorer();
 
             builder.Services.AddSwaggerGen();
+
+            var jwt = builder.Configuration.GetSection("Jwt");
+            var key = jwt["Key"];
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwt["Issuer"],
+                        ValidAudience = jwt["Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(key))
+                    };
+                });
+
+            builder.Services.AddAuthorization();
+
+            
 
             //for DB
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -71,6 +96,8 @@ namespace WebAPI_2
             // IMPORTANT: Add CORS before Authorization
             app.UseCors(MyAllowSpecificOrigins);
 
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
