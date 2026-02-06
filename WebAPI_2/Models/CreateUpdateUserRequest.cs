@@ -16,10 +16,10 @@ namespace WebAPI_2.Models
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
         [MinLength(6)]
         public string Password { get; set; }
-        [Required]
-        public bool IsAdmin { get; set; }
+        
+        public string Role { get; set; }
     }
 }
+

@@ -19,11 +19,9 @@ namespace WebAPI_2.DTOs
         public string Email { get; set; }
 
         [Required]
-        [MinLength(6)]
-        public string Password { get; set; }
-
-        public bool IsAdmin { get; set; }
+        public string Role { get; set; }
         
         public List<BookDTO> SavedBooks { get; set; } = new List<BookDTO>();
     }
 }
+

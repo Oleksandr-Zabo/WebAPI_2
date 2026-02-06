@@ -2,11 +2,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using WebAPI_2.Abstract;
 using WebAPI_2.Core;
 
 namespace WebAPI_2.Config
 {
-    public sealed class JwtToken
+    public sealed class JwtToken : IJwtToken
     {
         private readonly IConfiguration _config;
 
@@ -44,3 +45,4 @@ namespace WebAPI_2.Config
         }
     }
 }
+

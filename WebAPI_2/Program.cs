@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WebAPI_2.Abstract;
+using WebAPI_2.Config;
 using WebAPI_2.Core;
 using WebAPI_2.DAL;
 using WebAPI_2.DAL.Abstracts;
 using WebAPI_2.DAL.Repositories;
+using WebAPI_2.Data;
 using WebAPI_2.Services;
 
 namespace WebAPI_2
@@ -36,8 +38,6 @@ namespace WebAPI_2
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             //builder.Services.AddOpenApi();
-
-            builder.Services.AddSingleton<UsersStore>();
 
             builder.Services.AddEndpointsApiExplorer();
 
@@ -80,6 +80,11 @@ namespace WebAPI_2
             builder.Services.AddScoped<IAuthorService, AuthorService>();
             builder.Services.AddScoped<IBookService, BookService>();
             builder.Services.AddScoped<IGenreService, GenreService>();
+            
+            // Register Authentication Services
+            builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IJwtToken, JwtToken>();
 
             var app = builder.Build();
 
@@ -102,6 +107,12 @@ namespace WebAPI_2
 
 
             app.MapControllers();
+
+            // Initialize database and seed data
+            using (var scope = app.Services.CreateScope())
+            {
+                DbInitializer.InitializeAsync(scope.ServiceProvider).Wait();
+            }
 
             app.Run();
         }

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI_2.Abstract;
+using WebAPI_2.Core;
 using WebAPI_2.DTOs;
 using WebAPI_2.Models;
 
@@ -40,6 +42,7 @@ namespace WebAPI_2.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(GenreDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = Roles.Admin)]
         public IActionResult Create([FromBody] CreateUpdateGenreRequest request)
         {
             if (!ModelState.IsValid)
@@ -58,6 +61,7 @@ namespace WebAPI_2.Controllers
         [ProducesResponseType(typeof(GenreDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = Roles.Admin)]
         public IActionResult Update(int id, [FromBody] CreateUpdateGenreRequest request)
         {
             if (!ModelState.IsValid)
@@ -81,6 +85,7 @@ namespace WebAPI_2.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = Roles.Admin)]
         public IActionResult Delete(int id)
         {
             var (success, errorMessage) = _genreService.Delete(id);

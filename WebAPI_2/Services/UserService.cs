@@ -1,4 +1,5 @@
 ﻿using WebAPI_2.Abstract;
+using WebAPI_2.Core;
 using WebAPI_2.DAL.Abstracts;
 using WebAPI_2.DAL.Entities;
 using WebAPI_2.DTOs;
@@ -11,12 +12,18 @@ namespace WebAPI_2.Services
         private readonly IUserRepository _userRepository;
         private readonly IBookRepository _bookRepository;
         private readonly IAuthorRepository _authorRepository;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UserService(IUserRepository userRepository, IBookRepository bookRepository, IAuthorRepository authorRepository)
+        public UserService(
+            IUserRepository userRepository, 
+            IBookRepository bookRepository, 
+            IAuthorRepository authorRepository,
+            IPasswordHasher passwordHasher)
         {
             _userRepository = userRepository;
             _bookRepository = bookRepository;
             _authorRepository = authorRepository;
+            _passwordHasher = passwordHasher;
         }
 
         public (bool Success, string ErrorMessage, Guid? Id) Save(CreateUpdateUserRequest request)
@@ -27,8 +34,7 @@ namespace WebAPI_2.Services
             }
 
             // Check if user with same email already exists
-            var existingUsers = _userRepository.GetAll();
-            if (existingUsers.Any(u => u.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase)))
+            if (_userRepository.EmailExists(request.Email))
             {
                 return (false, $"User with email '{request.Email}' already exists!", null);
             }
@@ -39,8 +45,9 @@ namespace WebAPI_2.Services
                 Name = request.Name,
                 NickName = request.NickName,
                 Email = request.Email,
-                Password = request.Password, // In production, hash the password!
-                IsAdmin = request.IsAdmin
+                PasswordHash = _passwordHasher.HashPassword(request.Password),
+                Role = request.Role ?? Roles.User,
+                CreatedAt = DateTime.UtcNow
             };
 
             var result = _userRepository.AddUser(user);
@@ -60,12 +67,13 @@ namespace WebAPI_2.Services
 
             existingUser.Name = request.Name;
             existingUser.NickName = request.NickName;
-            existingUser.IsAdmin = request.IsAdmin;
+            existingUser.Email = request.Email;
+            existingUser.Role = request.Role ?? existingUser.Role;
             
             // Update password only if provided
             if (!string.IsNullOrWhiteSpace(request.Password) && request.Password.Length >= 6)
             {
-                existingUser.Password = request.Password; // In production, hash the password!
+                existingUser.PasswordHash = _passwordHasher.HashPassword(request.Password);
             }
 
             var result = _userRepository.UpdateUser(existingUser);
@@ -186,7 +194,7 @@ namespace WebAPI_2.Services
                 Name = user.Name,
                 NickName = user.NickName,
                 Email = user.Email,
-                IsAdmin = user.IsAdmin,
+                Role = user.Role,
                 SavedBooks = user.SavedBooks?.Select(b => new BookDTO
                 {
                     Id = b.Id,
