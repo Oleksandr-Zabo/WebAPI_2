@@ -24,7 +24,7 @@ namespace WebAPI_2.Controllers
             _jwt = new JwtToken(config);
         }
 
-        [HttpPost("api/auth/register")]
+        [HttpPost("register")]
         [AllowAnonymous]
         public IActionResult Register(RegisterRequest request)
         {
@@ -39,7 +39,7 @@ namespace WebAPI_2.Controllers
                 : Conflict("User already exists");
         }
 
-        [HttpPost("api/auth/login")]
+        [HttpPost("login")]
         [AllowAnonymous]
         public IActionResult Login(LoginRequest request)
         {
@@ -59,7 +59,7 @@ namespace WebAPI_2.Controllers
 
         }
 
-        [HttpPost("api/auth/createAdmin")]
+        [HttpPost("createAdmin")]
         [Authorize(Roles = Roles.Admin)]
         public IActionResult CreateAdmin(RegisterRequest request)
         {
