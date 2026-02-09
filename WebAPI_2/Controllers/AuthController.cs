@@ -60,7 +60,15 @@ namespace WebAPI_2.Controllers
                 return Unauthorized(new { message = "Invalid email or password" });
             }
 
-            return Ok(new AuthResponse { AccessToken = _jwtToken.Create(user) });
+            var token = _jwtToken.Create(user);
+
+            return Ok(new AuthResponse 
+            { 
+                AccessToken = token,
+                UserId = user.Id,
+                Email = user.Email,
+                Role = user.Role
+            });
         }
 
         [HttpPost("createAdmin")]

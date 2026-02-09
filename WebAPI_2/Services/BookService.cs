@@ -19,7 +19,7 @@ namespace WebAPI_2.Services
             _authorRepository = authorRepository;
         }
 
-        public (bool Success, string ErrorMessage, Guid? Id) Save(CreateUpdateBookRequest request)
+        public (bool Success, string ErrorMessage, Guid? Id) Save(CreateBookRequest request)
         {
             // Validate publish year
             var yearValidation = ValidatePublishYear(request.PublishYear);
@@ -74,7 +74,7 @@ namespace WebAPI_2.Services
             return (true, null, book.Id);
         }
 
-        public (bool Success, string ErrorMessage) Update(Guid id, CreateUpdateBookRequest request)
+        public (bool Success, string ErrorMessage) Update(Guid id, UpdateBookRequest request)
         {
             // Check if book exists
             var existingBook = _bookRepository.GetById(id);

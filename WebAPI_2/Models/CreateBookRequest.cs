@@ -2,7 +2,7 @@
 
 namespace WebAPI_2.Models
 {
-    public class CreateUpdateBookRequest
+    public class CreateBookRequest
     {
         [Required]
         [MinLength(2)]

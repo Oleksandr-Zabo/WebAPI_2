@@ -30,6 +30,9 @@ namespace WebAPI_2.Models
     public sealed class AuthResponse
     {
         public string AccessToken { get; set; }
+        public string UserId { get; set; }
+        public string Email { get; set; }
+        public string Role { get; set; }
     }
 }
 

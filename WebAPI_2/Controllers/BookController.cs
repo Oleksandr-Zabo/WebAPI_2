@@ -64,7 +64,7 @@ namespace WebAPI_2.Controllers
         [ProducesResponseType(typeof(BookDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Authorize(Roles = Roles.Admin)]
-        public IActionResult Create([FromBody] CreateUpdateBookRequest request)
+        public IActionResult Create([FromBody] CreateBookRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -83,7 +83,7 @@ namespace WebAPI_2.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize(Roles = Roles.Admin)]
-        public IActionResult Update(Guid id, [FromBody] CreateUpdateBookRequest request)
+        public IActionResult Update(Guid id, [FromBody] UpdateBookRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
