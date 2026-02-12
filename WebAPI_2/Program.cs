@@ -86,6 +86,9 @@ namespace WebAPI_2
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IJwtToken, JwtToken>();
 
+            // Register Gutendex API Service
+            builder.Services.AddHttpClient<IBookAPIService, BookAPIService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

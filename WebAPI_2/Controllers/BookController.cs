@@ -12,10 +12,12 @@ namespace WebAPI_2.Controllers
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
+        private readonly IBookAPIService _bookAPIService;
 
-        public BookController(IBookService bookService)
+        public BookController(IBookService bookService, IBookAPIService bookAPIService)
         {
             _bookService = bookService;
+            _bookAPIService = bookAPIService;
         }
 
         [HttpGet]
@@ -24,6 +26,30 @@ namespace WebAPI_2.Controllers
         {
             var books = _bookService.GetAll();
             return Ok(books);
+        }
+
+        [HttpGet("full")]
+        [ProducesResponseType(typeof(List<BookDTO>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllFull()
+        {
+            var books = await _bookAPIService.GetAllFullBooksAsync();
+            return Ok(books);
+        }
+
+        [HttpGet("cover")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetBookCoverByTitle([FromQuery] string title)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+                return BadRequest(new { message = "Title parameter is required." });
+
+            var (coverUrl, downloadCount) = await _bookAPIService.GetBookCoverByTitleAsync(title);
+
+            if (coverUrl == null)
+                return NotFound(new { message = $"Cover not found for book '{title}'." });
+
+            return Ok(new { title, coverUrl, downloadCount });
         }
 
         [HttpGet("{id:guid}")]
@@ -139,6 +165,62 @@ namespace WebAPI_2.Controllers
             }
 
             return Ok(new { message = "Genres assigned successfully." });
+        }
+        [HttpGet("search")]
+        [ProducesResponseType(typeof(List<BookDTO>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> SearchHybrid([FromQuery] string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return BadRequest(new { message = "Query parameter is required" });
+
+            var results = await _bookAPIService.SearchBookHybridAsync(query);
+            return Ok(results);
+        }
+
+        [HttpGet("search/external")]
+        [ProducesResponseType(typeof(GutendexResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> SearchExternal(
+            [FromQuery] string search = null,
+            [FromQuery] int page = 1)
+        {
+            if (string.IsNullOrWhiteSpace(search))
+                return BadRequest(new { message = "Search parameter is required" });
+
+            var searchParams = new GutendexSearchParams
+            {
+                Search = search,
+                Page = page
+            };
+
+            var results = await _bookAPIService.SearchBooksAsync(searchParams);
+            return Ok(results);
+        }
+
+        [HttpPost("import/{gutendexId:int}")]
+        [ProducesResponseType(typeof(BookDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ImportFromGutendex(int gutendexId)
+        {
+            var (success, errorMessage, bookId) = await _bookAPIService.ImportBookAsync(gutendexId);
+
+            if (!success)
+                return BadRequest(new { message = errorMessage });
+
+            var importedBook = _bookService.GetById(bookId.Value);
+            return CreatedAtAction(nameof(GetById), new { id = bookId.Value }, importedBook);
+        }
+
+        [HttpGet("external/{gutendexId:int}")]
+        [ProducesResponseType(typeof(GutendexBook), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetExternalBook(int gutendexId)
+        {
+            var book = await _bookAPIService.GetBookByIdAsync(gutendexId);
+
+            if (book == null)
+                return NotFound(new { message = "Book not found in Gutendex API" });
+
+            return Ok(book);
         }
     }
 }
