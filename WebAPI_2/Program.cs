@@ -84,14 +84,19 @@ namespace WebAPI_2
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
             {
                 //app.MapOpenApi();
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPI_2 v1");
+                    c.RoutePrefix = "swagger"; // відкриватиметься на /swagger
+                });
+
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             // IMPORTANT: Add CORS before Authorization
             app.UseCors(MyAllowSpecificOrigins);

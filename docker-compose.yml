@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    container_name: ms_sql_server
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=MyStr0ng!Pass123
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "MyStr0ng!Pass123", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=Library;User=sa;Password=MyStr0ng!Pass123;TrustServerCertificate=True;
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy

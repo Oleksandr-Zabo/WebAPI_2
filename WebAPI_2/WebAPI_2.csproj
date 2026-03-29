@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -13,17 +13,20 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\WebAPI_2.DAL\WebAPI_2.DAL.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Abstract\" />
     <Folder Include="DTOs\" />
     <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="WebAPI_2.DAL">
+      <HintPath>..\WebAPI_2.DAL\obj\Debug\net10.0\WebAPI_2.DAL.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
