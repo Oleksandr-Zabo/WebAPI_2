@@ -24,9 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="WebAPI_2.DAL">
-      <HintPath>..\WebAPI_2.DAL\obj\Debug\net10.0\WebAPI_2.DAL.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\WebAPI_2.DAL\WebAPI_2.DAL.csproj" />
   </ItemGroup>
 
 </Project>
