@@ -65,9 +65,11 @@ namespace WebAPI_2
             
 
             //for DB
+            var activeConnection = builder.Configuration.GetSection("ConnectionStrings")?["ActiveConnection"] ?? "LocalDb";
+            var connectionString = builder.Configuration.GetConnectionString(activeConnection);
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(connectionString));
+            
 
             // Register repositories
             builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -82,6 +84,13 @@ namespace WebAPI_2
             builder.Services.AddScoped<IGenreService, GenreService>();
 
             var app = builder.Build();
+
+            //migrations
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                db.Database.Migrate();
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
